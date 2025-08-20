@@ -1,0 +1,7 @@
+apptests/SignUpSteps.class
+apptests/LoginSteps.class
+apptests/Hooks.class
+apptests/CucumberRunnerTest.class
+apptests/BaseActions.class
+apptests/DriverManager.class
+apptests/AddBeneficiarySteps.class

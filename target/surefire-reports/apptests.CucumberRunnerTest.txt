@@ -1,0 +1,18 @@
+-------------------------------------------------------------------------------
+Test set: apptests.CucumberRunnerTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 86.942 s <<< FAILURE! - in apptests.CucumberRunnerTest
+Add Beneficiary.Log in and add a new beneficiary with unique data  Time elapsed: 23.31 s  <<< ERROR!
+java.lang.IllegalArgumentException: Keys to send should be a not null CharSequence
+	at org.openqa.selenium.remote.RemoteWebElement.sendKeys(RemoteWebElement.java:96)
+	at apptests.BaseActions.type(BaseActions.java:30)
+	at apptests.AddBeneficiarySteps.the_user_is_logged_in_and_starts_the_flow(AddBeneficiarySteps.java:45)
+	at ✽.the user is logged in and starts the Add Beneficiary flow(classpath:features/AddBeneficiary.feature:6)
+
+Login.User logs in with valid credentials  Time elapsed: 24.877 s  <<< ERROR!
+java.lang.IllegalArgumentException: Keys to send should be a not null CharSequence
+	at org.openqa.selenium.remote.RemoteWebElement.sendKeys(RemoteWebElement.java:96)
+	at apptests.BaseActions.type(BaseActions.java:30)
+	at apptests.LoginSteps.the_user_enters_valid_credentials(LoginSteps.java:29)
+	at ✽.the user enters valid credentials(classpath:features/Login.feature:7)
+
