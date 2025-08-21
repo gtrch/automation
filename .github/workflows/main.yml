@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   browserstack:
-    runs-on: [self-hosted, android, local]
+    runs-on: ubuntu-latest
     env:
       BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
       BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
@@ -32,18 +32,29 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Run BrowserStack tests
-        run: mvn -B -e -X -Dtest=apptests.CucumberRunnerTest test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/cache@v4
         with:
-          name: bs-reports
-          path: |
-            reports/**
-            target/surefire-reports/**
-            target/cucumber-report.json
+          path: ~/.m2/repository
+          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: m2-${{ runner.os }}-
+      - name: Run Tests (debug)
+        run: |
+          mvn -B -e -X -Dtest=apptests.CucumberRunnerTest test \
+            -DAPP_URL=${{ env.APP_URL }} \
+            -DAPPIUM_URL=${{ env.APPIUM_URL }} \
+            -DDEVICE_NAME="${{ env.DEVICE_NAME }}" \
+            -DPLATFORM_VERSION="${{ env.PLATFORM_VERSION }}" \
+            -DAUTOMATION_NAME=${{ env.AUTOMATION_NAME }} \
+            -DLOGIN_EMAIL=${{ env.LOGIN_EMAIL }} \
+            -DLOGIN_PASSWORD=${{ env.LOGIN_PASSWORD }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bs-surefire-reports
+          path: target/surefire-reports/**
 
   local_self_hosted:
-    runs-on: [self-hosted, android, local]
+    runs-on: [self-hosted, android]
     env:
       LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
       LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
@@ -60,14 +71,20 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - run: npm install -g appium@next
+      - run: npm install appium@next
       - run: nohup npx appium --base-path /wd/hub > appium.log 2>&1 &
-      - name: Run Local tests
-        run: mvn -B -e -X -Dtest=apptests.CucumberRunnerTest test
+      - name: Run Tests (local debug)
+        run: |
+          mvn -B -e -X -Dtest=apptests.CucumberRunnerTest test \
+            -DAPP_URL=${{ env.APP_URL }} \
+            -DAPPIUM_URL=${{ env.APPIUM_URL }} \
+            -DDEVICE_NAME="${{ env.DEVICE_NAME }}" \
+            -DPLATFORM_VERSION="${{ env.PLATFORM_VERSION }}" \
+            -DAUTOMATION_NAME=${{ env.AUTOMATION_NAME }} \
+            -DLOGIN_EMAIL=${{ env.LOGIN_EMAIL }} \
+            -DLOGIN_PASSWORD=${{ env.LOGIN_PASSWORD }}
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: local-reports
-          path: |
-            reports/**
-            target/surefire-reports/**
-            target/cucumber-report.json
+          name: local-surefire-reports
+          path: target/surefire-reports/**
