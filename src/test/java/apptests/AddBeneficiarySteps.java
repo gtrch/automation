@@ -9,12 +9,10 @@ import io.github.cdimascio.dotenv.Dotenv;
 import com.browserstack.AppPercySDK;
 
 import java.util.Random;
+import io.appium.java_client.AppiumBy;
 
 public class AddBeneficiarySteps {
-
-    BaseActions actions;
-    Dotenv dotenv = Dotenv.load();
-    Faker faker = new Faker();
+    private BaseActions actions;
 
     private BaseActions getActions() {
         if (actions == null) {
@@ -23,70 +21,53 @@ public class AddBeneficiarySteps {
         return actions;
     }
 
-    String firstName = faker.name().firstName();
-    String lastName = faker.name().lastName();
-    String email = "test+" + firstName.toLowerCase() + lastName.toLowerCase() + "@redchapina.com";
-    String phone = "55555" + (10000 + new Random().nextInt(89999));
-
-    @Given("location permission is granted")
+    @And("location permission is granted")
     public void location_permission_is_granted() {
         getActions().acceptLocationPermissionIfVisible();
+
+        String scenarioName = System.getProperty("CURRENT_SCENARIO", "AddBeneficiary");
+        AppPercySDK.screenshot(DriverManager.driver, scenarioName + " - Location Permission");
     }
 
-    @Given("the user is logged in and starts the Add Beneficiary flow")
-    public void the_user_is_logged_in_and_starts_the_flow() {
-        String loginEmail = dotenv.get("LOGIN_EMAIL");
-        String loginPassword = dotenv.get("LOGIN_PASSWORD");
+    @When("the user navigates to Add Beneficiary")
+    public void the_user_navigates_to_add_beneficiary() {
+        By addBeneficiaryBtn = AppiumBy.xpath("//android.widget.Button[@text=\"Añadir beneficiario\"]");
+        getActions().click(addBeneficiaryBtn);
 
-        By emailField = By.xpath("//android.widget.EditText[@text=\"Correo electrónico\"]");
-        By passField = By.xpath("//android.widget.EditText[@text=\"Contraseña\"]");
-        By loginBtn = By.xpath("//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup[4]");
-
-        getActions().type(emailField, loginEmail);
-        getActions().type(passField, loginPassword);
-        getActions().click(loginBtn);
-
-        try {
-            Thread.sleep(10000);
-            assertNotNull(DriverManager.driver.getSessionId(), "!Error: Login failed or session lost");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        getActions().click(By.xpath("//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[4]/android.view.ViewGroup[1]/android.view.ViewGroup"));
-        getActions().click(By.xpath("//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]"));
-        getActions().click(By.xpath("//android.widget.Button[@resource-id=\"com.android.permissioncontroller:id/permission_allow_foreground_only_button\"]"));
+        String scenarioName = System.getProperty("CURRENT_SCENARIO", "AddBeneficiary");
+        AppPercySDK.screenshot(DriverManager.driver, scenarioName + " - Navigated to Add Beneficiary");
     }
 
-    @When("the user fills in the beneficiary form")
-    public void the_user_fills_in_the_form() {
-        getActions().type(By.xpath("//android.widget.EditText[@text=\"Primer nombre\"]"), firstName);
-        getActions().type(By.xpath("//android.widget.EditText[@text=\"Primer apellido\"]"), lastName);
+    @And("fills in beneficiary details")
+    public void fills_in_beneficiary_details() {
+        String name = "Beneficiary " + System.currentTimeMillis();
+        String phone = "555" + (int)(Math.random() * 10000);
 
-        getActions().click(By.xpath("//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup[5]/android.view.ViewGroup/android.view.ViewGroup"));
-        getActions().click(By.xpath("//android.widget.TextView[@text=\"Amistad\"]"));
+        By nameField = By.xpath("//android.widget.EditText[@text=\"Nombre\"]");
+        By phoneField = By.xpath("//android.widget.EditText[@text=\"Teléfono\"]");
 
-        getActions().click(By.xpath("//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup[6]"));
+        getActions().type(nameField, name);
+        getActions().type(phoneField, phone);
 
-        getActions().click(By.xpath("//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup"));
-        getActions().click(By.xpath("//android.widget.TextView[@text=\"Estados Unidos\"]"));
-        getActions().click(By.xpath("//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup"));
-        getActions().click(By.xpath("//android.widget.TextView[@text=\"Alaska\"]"));
-        getActions().click(By.xpath("//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[3]/android.view.ViewGroup/android.view.ViewGroup"));
-        getActions().click(By.xpath("//android.widget.TextView[@text=\"Adak\"]"));
+        String scenarioName = System.getProperty("CURRENT_SCENARIO", "AddBeneficiary");
+        AppPercySDK.screenshot(DriverManager.driver, scenarioName + " - Entered Beneficiary Details");
+    }
 
-        getActions().type(By.xpath("//android.widget.EditText[@text=\"Dirección\"]"), "123 Main St");
-        getActions().click(By.xpath("//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[3]/android.view.ViewGroup"));
-        getActions().type(By.xpath("//android.widget.EditText[@text=\"Correo electrónico\"]"), email);
-        getActions().type(By.xpath("//android.widget.EditText[@text=\"Número de celular\"]"), phone);
-        getActions().click(By.xpath("//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup"));
-        getActions().click(By.xpath("//android.widget.FrameLayout[@resource-id=\"android:id/content\"]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[3]/android.view.ViewGroup[2]"));
+    @And("saves the beneficiary")
+    public void saves_the_beneficiary() {
+        By saveBtn = AppiumBy.xpath("//android.widget.Button[@text=\"Guardar\"]");
+        getActions().click(saveBtn);
 
-        String scenarioName = System.getProperty("CURRENT_SCENARIO");
-        AppPercySDK.screenshot(DriverManager.driver, scenarioName + " - Filled Add Beneficiary Form");
+        String scenarioName = System.getProperty("CURRENT_SCENARIO", "AddBeneficiary");
+        AppPercySDK.screenshot(DriverManager.driver, scenarioName + " - Saved Beneficiary");
+    }
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException ignored) {}
+    @Then("the new beneficiary should appear in the list")
+    public void the_new_beneficiary_should_appear_in_the_list() {
+        By beneficiaryList = AppiumBy.xpath("//android.widget.TextView[contains(@text,'Beneficiary')]");
+        getActions().waitForVisible(beneficiaryList, 30);
+
+        String scenarioName = System.getProperty("CURRENT_SCENARIO", "AddBeneficiary");
+        AppPercySDK.screenshot(DriverManager.driver, scenarioName + " - Beneficiary Listed");
     }
 }
