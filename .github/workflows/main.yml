@@ -47,32 +47,3 @@ jobs:
             target/surefire-reports/**
             target/cucumber-report.json
 
-  local_self_hosted:
-    runs-on: [self-hosted, android]
-    env:
-      LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
-      LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
-      APPIUM_URL: http://127.0.0.1:4723/wd/hub
-      APK_PATH: /home/saraperez/Downloads/app.apk
-      AUTOMATION_NAME: UiAutomator2
-      PLATFORM_NAME: Android
-      PLATFORM_VERSION: "14"
-      DEVICE_NAME: test
-      AVD_NAME: test
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-      - run: npm install appium@next
-      - run: nohup npx appium --base-path /wd/hub > appium.log 2>&1 &
-      - name: Tests
-        run: mvn -B -q -Dtest=apptests.CucumberRunnerTest test
-      - uses: actions/upload-artifact@v4
-        with:
-          name: local-reports
-          path: |
-            reports/**
-            target/surefire-reports/**
-            target/cucumber-report.json
