@@ -20,7 +20,7 @@ jobs:
       PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
       LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
       LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
-      APPIUM_URL: https://hub.browserstack.com/wd/hub
+      APPIUM_URL: https://${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}@hub.browserstack.com/wd/hub
       APK_PATH: bs://a63b3f7abbef83cdd51f2d3d6c9ac0402d451d23
       DEVICE_NAME: Samsung Galaxy S22 Ultra
       PLATFORM_NAME: Android
@@ -38,26 +38,14 @@ jobs:
           path: ~/.m2/repository
           key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: m2-${{ runner.os }}-
-      - name: Create .env
-        run: |
-          cat > .env <<'EOF'
-          APPIUM_URL=${APPIUM_URL}
-          APK_PATH=${APK_PATH}
-          AUTOMATION_NAME=${AUTOMATION_NAME}
-          PLATFORM_NAME=${PLATFORM_NAME}
-          PLATFORM_VERSION=${PLATFORM_VERSION}
-          DEVICE_NAME=${DEVICE_NAME}
-          AVD_NAME=${AVD_NAME}
-          LOGIN_EMAIL=${LOGIN_EMAIL}
-          LOGIN_PASSWORD=${LOGIN_PASSWORD}
-          EOF
-      - name: Functional tests
+      - name: Tests
         run: mvn -B -q -Dtest=apptests.CucumberRunnerTest test
       - uses: actions/upload-artifact@v4
         with:
           name: bs-reports
           path: |
             reports/**
+            target/surefire-reports/**
             target/cucumber-report.json
 
   local_self_hosted:
@@ -80,24 +68,12 @@ jobs:
           java-version: 17
       - run: npm i -g appium@next
       - run: nohup appium > appium.log 2>&1 &
-      - name: Create .env
-        run: |
-          cat > .env <<'EOF'
-          APPIUM_URL=${APPIUM_URL}
-          APK_PATH=${APK_PATH}
-          AUTOMATION_NAME=${AUTOMATION_NAME}
-          PLATFORM_NAME=${PLATFORM_NAME}
-          PLATFORM_VERSION=${PLATFORM_VERSION}
-          DEVICE_NAME=${DEVICE_NAME}
-          AVD_NAME=${AVD_NAME}
-          LOGIN_EMAIL=${LOGIN_EMAIL}
-          LOGIN_PASSWORD=${LOGIN_PASSWORD}
-          EOF
-      - name: Local tests
+      - name: Tests
         run: mvn -B -q -Dtest=apptests.CucumberRunnerTest test
       - uses: actions/upload-artifact@v4
         with:
           name: local-reports
           path: |
             reports/**
+            target/surefire-reports/**
             target/cucumber-report.json

@@ -7,38 +7,44 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.time.Duration;
 import java.net.URL;
 import java.net.URI;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class DriverManager {
     public static AndroidDriver driver;
 
-    public static void init() throws Exception {
-        if (driver != null) {
-            driver.quit();
-            driver = null;
-        }
+    private static String readVar(String key, Dotenv dotenv) {
+        String v = System.getenv(key);
+        if (v == null || v.isBlank()) v = dotenv != null ? dotenv.get(key) : null;
+        return v;
+    }
 
-        Dotenv dotenv = Dotenv.load();
-        String appiumUrl = dotenv.get("APPIUM_URL");
-        String apkPath = dotenv.get("APK_PATH");
-        String deviceName = dotenv.get("DEVICE_NAME");
-        String platformName = dotenv.get("PLATFORM_NAME");
-        String platformVersion = dotenv.get("PLATFORM_VERSION");
-        String automationName = dotenv.get("AUTOMATION_NAME");
-        String avdName = dotenv.get("AVD_NAME");
+    public static void init() throws Exception {
+        Dotenv dotenv = null;
+        try { dotenv = Dotenv.configure().ignoreIfMissing().load(); } catch (Exception ignored) {}
+
+        String appiumUrl       = readVar("APPIUM_URL", dotenv);
+        String apkPath         = readVar("APK_PATH", dotenv);
+        String deviceName      = readVar("DEVICE_NAME", dotenv);
+        String platformName    = readVar("PLATFORM_NAME", dotenv);
+        String platformVersion = readVar("PLATFORM_VERSION", dotenv);
+        String automationName  = readVar("AUTOMATION_NAME", dotenv);
+        String avdName         = readVar("AVD_NAME", dotenv);
 
         UiAutomator2Options options = new UiAutomator2Options()
                 .setDeviceName(deviceName)
                 .setPlatformName(platformName)
                 .setPlatformVersion(platformVersion)
                 .setAutomationName(automationName)
-                .setAvd(avdName)
-                .setAvdLaunchTimeout(Duration.ofMillis(200000))
-                .setNewCommandTimeout(Duration.ofSeconds(200000))
+                .setNewCommandTimeout(java.time.Duration.ofSeconds(200))
                 .setFullReset(true)
                 .setNoReset(false)
                 .setApp(apkPath);
 
-        URL url = URI.create(appiumUrl).toURL();
+        if (avdName != null && !avdName.isBlank()) {
+            options.setAvd(avdName).setAvdLaunchTimeout(java.time.Duration.ofMillis(200000));
+        }
+
+        java.net.URL url = java.net.URI.create(appiumUrl).toURL();
         driver = new AndroidDriver(url, options);
     }
 }
