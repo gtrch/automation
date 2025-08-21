@@ -1,5 +1,9 @@
 userName: ${BROWSERSTACK_USERNAME}
 accessKey: ${BROWSERSTACK_ACCESS_KEY}
+buildName: "QA features"
+projectName: "RCH Automation"
+framework: junit4
+testObservability: true
 
 app: ${APK_PATH}
 
