@@ -1,3 +1,4 @@
+apptests/CucumberExtentReporter.class
 apptests/SignUpSteps.class
 apptests/LoginSteps.class
 apptests/Hooks.class

@@ -1,0 +1,103 @@
+name: Automation CI
+
+on:
+  push:
+    branches: ["feature/**"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browserstack:
+    runs-on: ubuntu-latest
+    env:
+      BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+      BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+      PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+      LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
+      LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+      APPIUM_URL: https://hub.browserstack.com/wd/hub
+      APK_PATH: bs://a63b3f7abbef83cdd51f2d3d6c9ac0402d451d23
+      DEVICE_NAME: Samsung Galaxy S22 Ultra
+      PLATFORM_NAME: Android
+      PLATFORM_VERSION: "12.0"
+      AUTOMATION_NAME: UiAutomator2
+      AVD_NAME: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: m2-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: m2-${{ runner.os }}-
+      - name: Create .env
+        run: |
+          cat > .env <<'EOF'
+          APPIUM_URL=${APPIUM_URL}
+          APK_PATH=${APK_PATH}
+          AUTOMATION_NAME=${AUTOMATION_NAME}
+          PLATFORM_NAME=${PLATFORM_NAME}
+          PLATFORM_VERSION=${PLATFORM_VERSION}
+          DEVICE_NAME=${DEVICE_NAME}
+          AVD_NAME=${AVD_NAME}
+          LOGIN_EMAIL=${LOGIN_EMAIL}
+          LOGIN_PASSWORD=${LOGIN_PASSWORD}
+          EOF
+      - name: Functional tests
+        run: mvn -B -q -Dtest=apptests.CucumberRunnerTest test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bs-reports
+          path: |
+            reports/**
+            target/cucumber-report.json
+
+  local_self_hosted:
+    runs-on: [self-hosted, android]
+    env:
+      LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
+      LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+      APPIUM_URL: http://127.0.0.1:4723/
+      APK_PATH: /home/saraperez/Downloads/app.apk
+      AUTOMATION_NAME: UiAutomator2
+      PLATFORM_NAME: Android
+      PLATFORM_VERSION: "14"
+      DEVICE_NAME: test
+      AVD_NAME: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: npm i -g appium@next
+      - run: nohup appium > appium.log 2>&1 &
+      - name: Create .env
+        run: |
+          cat > .env <<'EOF'
+          APPIUM_URL=${APPIUM_URL}
+          APK_PATH=${APK_PATH}
+          AUTOMATION_NAME=${AUTOMATION_NAME}
+          PLATFORM_NAME=${PLATFORM_NAME}
+          PLATFORM_VERSION=${PLATFORM_VERSION}
+          DEVICE_NAME=${DEVICE_NAME}
+          AVD_NAME=${AVD_NAME}
+          LOGIN_EMAIL=${LOGIN_EMAIL}
+          LOGIN_PASSWORD=${LOGIN_PASSWORD}
+          EOF
+      - name: Local tests
+        run: mvn -B -q -Dtest=apptests.CucumberRunnerTest test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: local-reports
+          path: |
+            reports/**
+            target/cucumber-report.json

@@ -9,21 +9,18 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <dependencies>
-        <!-- Selenium -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>4.31.0</version>
         </dependency>
 
-        <!-- Appium Java client -->
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
             <version>9.4.0</version>
         </dependency>
 
-        <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -31,14 +28,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Cucumber core -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
             <version>7.14.0</version>
         </dependency>
 
-        <!-- Cucumber JUnit Platform Engine -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit-platform-engine</artifactId>
@@ -46,7 +41,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JUnit Platform Suite API -->
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite-api</artifactId>
@@ -54,7 +48,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JUnit @Suite with Cucumber -->
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite</artifactId>
@@ -62,32 +55,40 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- dotenv -->
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
             <version>3.2.0</version>
         </dependency>
 
-        <!-- Faker -->
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>1.0.2</version>
         </dependency>
 
-        <!-- BrowserStack SDK -->
         <dependency>
             <groupId>com.browserstack</groupId>
             <artifactId>browserstack-java-sdk</artifactId>
             <version>LATEST</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>5.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Java 17 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -98,14 +99,12 @@
                 </configuration>
             </plugin>
 
-            <!-- Surefire plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M9</version>
             </plugin>
 
-            <!-- Dependency plugin -->
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.3.0</version>
@@ -119,24 +118,20 @@
                 </executions>
             </plugin>
 
-            <!-- Cucumber HTML Report plugin -->
             <plugin>
-                <groupId>net.masterthought</groupId>
-                <artifactId>cucumber-reporting</artifactId>
-                <version>5.7.0</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>generate-html-reports</id>
-                        <phase>verify</phase>
+                        <id>generate-dashboard</id>
+                        <phase>test</phase>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>java</goal>
                         </goals>
                         <configuration>
-                            <projectName>App Automation</projectName>
-                            <outputDirectory>${project.build.directory}/cucumber-html</outputDirectory>
-                            <jsonFiles>
-                                <param>${project.build.directory}/cucumber-report.json</param>
-                            </jsonFiles>
+                            <mainClass>apptests.CucumberExtentReporter</mainClass>
+                            <classpathScope>test</classpathScope>
                         </configuration>
                     </execution>
                 </executions>

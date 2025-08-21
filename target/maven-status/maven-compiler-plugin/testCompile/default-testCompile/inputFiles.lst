@@ -1,5 +1,6 @@
 /home/saraperez/IdeaProjects/appAutomation/src/test/java/apptests/SignUpSteps.java
 /home/saraperez/IdeaProjects/appAutomation/src/test/java/apptests/CucumberRunnerTest.java
+/home/saraperez/IdeaProjects/appAutomation/src/test/java/apptests/CucumberExtentReporter.java
 /home/saraperez/IdeaProjects/appAutomation/src/test/java/apptests/AddBeneficiarySteps.java
 /home/saraperez/IdeaProjects/appAutomation/src/test/java/apptests/DriverManager.java
 /home/saraperez/IdeaProjects/appAutomation/src/test/java/apptests/LoginSteps.java
