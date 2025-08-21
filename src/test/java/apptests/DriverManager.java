@@ -34,7 +34,7 @@ public class DriverManager {
 
         if (appiumUrl != null && appiumUrl.contains("browserstack.com")) {
             DesiredCapabilities caps = new DesiredCapabilities();
-            caps.setCapability("app", apkPath);
+            caps.setCapability("appium:app", apkPath);
 
             Map<String, Object> bstackOptions = new HashMap<>();
             bstackOptions.put("userName", user);
