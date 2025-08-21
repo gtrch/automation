@@ -1,30 +1,18 @@
 userName: ${BROWSERSTACK_USERNAME}
 accessKey: ${BROWSERSTACK_ACCESS_KEY}
 
-projectName: BrowserStack Samples
-buildName: browserstack build
-buildIdentifier: '#${BUILD_NUMBER}'
-
-app: bs://a63b3f7abbef83cdd51f2d3d6c9ac0402d451d23
+app: ${APK_PATH}
 
 platforms:
-  - deviceName: Samsung Galaxy S22 Ultra
-    platformVersion: 12.0
-    platformName: android
-  - deviceName: Samsung Galaxy S21
-    platformVersion: 11.0
-    platformName: android
-  - deviceName: Google Pixel 6 Pro
-    platformVersion: 12.0
-    platformName: android
-
-percy: true
-percyCaptureMode: manual
-
-source: java:appium-archetype-integrate:v1.3
+  - deviceName: ${DEVICE_NAME}
+    platformVersion: ${PLATFORM_VERSION}
+    platformName: ${PLATFORM_NAME}
 
 parallelsPerPlatform: 1
 browserstackLocal: true
+
+percy: true
+percyCaptureMode: manual
 
 debug: false
 networkLogs: false
