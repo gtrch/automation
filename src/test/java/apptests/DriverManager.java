@@ -33,15 +33,16 @@ public class DriverManager {
         String key             = readVar("BROWSERSTACK_ACCESS_KEY", dotenv);
 
         if (appiumUrl != null && appiumUrl.contains("browserstack.com")) {
+            DesiredCapabilities caps = new DesiredCapabilities();
+            caps.setCapability("app", apkPath);
+
             Map<String, Object> bstackOptions = new HashMap<>();
             bstackOptions.put("userName", user);
             bstackOptions.put("accessKey", key);
             bstackOptions.put("deviceName", deviceName);
             bstackOptions.put("platformVersion", platformVersion);
             bstackOptions.put("platformName", platformName);
-            bstackOptions.put("app", apkPath);
 
-            DesiredCapabilities caps = new DesiredCapabilities();
             caps.setCapability("bstack:options", bstackOptions);
 
             driver = new AndroidDriver(new URL(appiumUrl), caps);
