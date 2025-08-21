@@ -1,11 +1,14 @@
-userName: ${BROWSERSTACK_USERNAME}
-accessKey: ${BROWSERSTACK_ACCESS_KEY}
-buildName: "QA features"
-projectName: "RCH Automation"
+userName: saraecheverra_eJbOj9
+accessKey: Z9oxKXuUkkTyCCHERJNL
+buildName: QA features
+projectName: RCH Automation
 framework: junit4
+# Test Observability is an intelligent test reporting & debugging product. It collects data using the SDK. Read more about what data is collected at https://www.browserstack.com/docs/test-observability/references/terms-and-conditions
+# Visit observability.browserstack.com to see your test reports and insights. To disable test observability, specify `testObservability: false` in the key below.
 testObservability: true
+browserstackAutomation: false
 
-app: ${APK_PATH}
+app: bs://sample.app
 
 platforms:
   - deviceName: ${DEVICE_NAME}
@@ -21,3 +24,5 @@ percyCaptureMode: manual
 debug: false
 networkLogs: false
 consoleLogs: errors
+
+source: java:appium-intellij:v1.1.6
