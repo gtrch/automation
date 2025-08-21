@@ -21,7 +21,7 @@ jobs:
       LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
       LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
       APPIUM_URL: https://${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}@hub.browserstack.com/wd/hub
-      APK_PATH: bs://a63b3f7abbef83cdd51f2d3d6c9ac0402d451d23
+      APK_PATH: bs://2689d6631ff8888a06599ca0d46b12eed3a7a49f
       DEVICE_NAME: Samsung Galaxy S22 Ultra
       PLATFORM_NAME: Android
       PLATFORM_VERSION: "12.0"
