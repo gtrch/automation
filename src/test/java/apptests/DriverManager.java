@@ -12,30 +12,56 @@ import java.util.Map;
 public class DriverManager {
     public static AndroidDriver driver;
 
+    private static String readVar(String key, Dotenv dotenv) {
+        String v = System.getenv(key);
+        if (v == null || v.isBlank()) v = dotenv != null ? dotenv.get(key) : null;
+        return v;
+    }
+
     public static void init() throws Exception {
-        String appUrl = System.getProperty("APP_URL");
-        String deviceName = System.getProperty("DEVICE_NAME", "Samsung Galaxy S22 Ultra");
-        String platformVersion = System.getProperty("PLATFORM_VERSION", "12.0");
-        String automationName = System.getProperty("AUTOMATION_NAME", "UiAutomator2");
-        String appiumUrl = System.getProperty("APPIUM_URL");
+        Dotenv dotenv = null;
+        try { dotenv = Dotenv.configure().ignoreIfMissing().load(); } catch (Exception ignored) {}
 
-        UiAutomator2Options options = new UiAutomator2Options()
-                .setDeviceName(deviceName)
-                .setPlatformName("Android")
-                .setPlatformVersion(platformVersion)
-                .setAutomationName(automationName);
+        String appiumUrl       = readVar("APPIUM_URL", dotenv);
+        String apkPath         = readVar("APK_PATH", dotenv);
+        String deviceName      = readVar("DEVICE_NAME", dotenv);
+        String platformName    = readVar("PLATFORM_NAME", dotenv);
+        String platformVersion = readVar("PLATFORM_VERSION", dotenv);
+        String automationName  = readVar("AUTOMATION_NAME", dotenv);
+        String avdName         = readVar("AVD_NAME", dotenv);
+        String user            = readVar("BROWSERSTACK_USERNAME", dotenv);
+        String key             = readVar("BROWSERSTACK_ACCESS_KEY", dotenv);
 
-        if (appiumUrl.contains("browserstack")) {
-            HashMap<String, Object> bstackOptions = new HashMap<>();
-            bstackOptions.put("projectName", "Automation CI");
-            bstackOptions.put("buildName", "GitHub Actions Run");
-            bstackOptions.put("sessionName", "Cucumber Tests");
-            options.setCapability("bstack:options", bstackOptions);
-            options.setCapability("appium:app", appUrl);
+        if (appiumUrl != null && appiumUrl.contains("browserstack.com")) {
+            DesiredCapabilities caps = new DesiredCapabilities();
+            caps.setCapability("appium:app", apkPath);
+
+            Map<String, Object> bstackOptions = new HashMap<>();
+            bstackOptions.put("userName", user);
+            bstackOptions.put("accessKey", key);
+            bstackOptions.put("deviceName", deviceName);
+            bstackOptions.put("platformVersion", platformVersion);
+            bstackOptions.put("platformName", platformName);
+
+            caps.setCapability("bstack:options", bstackOptions);
+
+            driver = new AndroidDriver(new URL(appiumUrl), caps);
         } else {
-            options.setApp(appUrl);
-        }
+            UiAutomator2Options options = new UiAutomator2Options()
+                    .setDeviceName(deviceName)
+                    .setPlatformName(platformName)
+                    .setPlatformVersion(platformVersion)
+                    .setAutomationName(automationName)
+                    .setNewCommandTimeout(java.time.Duration.ofSeconds(200))
+                    .setFullReset(true)
+                    .setNoReset(false)
+                    .setApp(apkPath);
 
-        driver = new AndroidDriver(new URL(appiumUrl), options);
+            if (avdName != null && !avdName.isBlank()) {
+                options.setAvd(avdName).setAvdLaunchTimeout(java.time.Duration.ofMillis(200000));
+            }
+
+            driver = new AndroidDriver(new URL(appiumUrl), options);
+        }
     }
 }
