@@ -1,13 +1,13 @@
 package apptests;
 
-import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.options.UiAutomator2Options;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.time.Duration;
 import java.net.URL;
-import java.net.URI;
-import io.github.cdimascio.dotenv.Dotenv;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DriverManager {
     public static AndroidDriver driver;
@@ -29,22 +29,43 @@ public class DriverManager {
         String platformVersion = readVar("PLATFORM_VERSION", dotenv);
         String automationName  = readVar("AUTOMATION_NAME", dotenv);
         String avdName         = readVar("AVD_NAME", dotenv);
+        String user            = readVar("BROWSERSTACK_USERNAME", dotenv);
+        String key             = readVar("BROWSERSTACK_ACCESS_KEY", dotenv);
 
-        UiAutomator2Options options = new UiAutomator2Options()
-                .setDeviceName(deviceName)
-                .setPlatformName(platformName)
-                .setPlatformVersion(platformVersion)
-                .setAutomationName(automationName)
-                .setNewCommandTimeout(java.time.Duration.ofSeconds(200))
-                .setFullReset(true)
-                .setNoReset(false)
-                .setApp(apkPath);
+        if (appiumUrl != null && appiumUrl.contains("browserstack.com")) {
+            // --------------------------
+            // BrowserStack configuration
+            // --------------------------
+            DesiredCapabilities caps = new DesiredCapabilities();
+            caps.setCapability("app", apkPath);
 
-        if (avdName != null && !avdName.isBlank()) {
-            options.setAvd(avdName).setAvdLaunchTimeout(java.time.Duration.ofMillis(200000));
+            Map<String, Object> bstackOptions = new HashMap<>();
+            bstackOptions.put("userName", user);
+            bstackOptions.put("accessKey", key);
+            bstackOptions.put("deviceName", deviceName);
+            bstackOptions.put("platformVersion", platformVersion);
+            bstackOptions.put("platformName", platformName);
+
+            caps.setCapability("bstack:options", bstackOptions);
+
+            driver = new AndroidDriver(new URL(appiumUrl), caps);
+        } else {
+
+            UiAutomator2Options options = new UiAutomator2Options()
+                    .setDeviceName(deviceName)
+                    .setPlatformName(platformName)
+                    .setPlatformVersion(platformVersion)
+                    .setAutomationName(automationName)
+                    .setNewCommandTimeout(java.time.Duration.ofSeconds(200))
+                    .setFullReset(true)
+                    .setNoReset(false)
+                    .setApp(apkPath);
+
+            if (avdName != null && !avdName.isBlank()) {
+                options.setAvd(avdName).setAvdLaunchTimeout(java.time.Duration.ofMillis(200000));
+            }
+
+            driver = new AndroidDriver(new URL(appiumUrl), options);
         }
-
-        java.net.URL url = java.net.URI.create(appiumUrl).toURL();
-        driver = new AndroidDriver(url, options);
     }
 }

@@ -26,7 +26,6 @@ jobs:
       PLATFORM_NAME: Android
       PLATFORM_VERSION: "12.0"
       AUTOMATION_NAME: UiAutomator2
-      AVD_NAME: ""
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -53,7 +52,7 @@ jobs:
     env:
       LOGIN_EMAIL: ${{ secrets.LOGIN_EMAIL }}
       LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
-      APPIUM_URL: http://127.0.0.1:4723/
+      APPIUM_URL: http://127.0.0.1:4723/wd/hub
       APK_PATH: /home/saraperez/Downloads/app.apk
       AUTOMATION_NAME: UiAutomator2
       PLATFORM_NAME: Android
@@ -66,8 +65,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - run: npm i -g appium@next
-      - run: nohup appium > appium.log 2>&1 &
+      - run: npm install appium@next
+      - run: nohup npx appium --base-path /wd/hub > appium.log 2>&1 &
       - name: Tests
         run: mvn -B -q -Dtest=apptests.CucumberRunnerTest test
       - uses: actions/upload-artifact@v4
