@@ -20,7 +20,9 @@ public class DriverManager {
 
     public static void init() throws Exception {
         Dotenv dotenv = null;
-        try { dotenv = Dotenv.configure().ignoreIfMissing().load(); } catch (Exception ignored) {}
+        try {
+            dotenv = Dotenv.configure().ignoreIfMissing().load();
+        } catch (Exception ignored) {}
 
         String appiumUrl       = readVar("APPIUM_URL", dotenv);
         String apkPath         = readVar("APK_PATH", dotenv);
@@ -33,6 +35,10 @@ public class DriverManager {
         String key             = readVar("BROWSERSTACK_ACCESS_KEY", dotenv);
 
         if (appiumUrl != null && appiumUrl.contains("browserstack.com")) {
+            if (apkPath == null || apkPath.isBlank()) {
+                throw new RuntimeException("APK_PATH is not set. Please set APK_PATH=bs://<your-app-id>");
+            }
+
             DesiredCapabilities caps = new DesiredCapabilities();
             caps.setCapability("appium:app", apkPath);
 
@@ -42,6 +48,8 @@ public class DriverManager {
             bstackOptions.put("deviceName", deviceName);
             bstackOptions.put("platformVersion", platformVersion);
             bstackOptions.put("platformName", platformName);
+            bstackOptions.put("projectName", "RCH Automation");
+            bstackOptions.put("buildName", "QA features");
 
             caps.setCapability("bstack:options", bstackOptions);
 

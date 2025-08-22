@@ -7,7 +7,8 @@ framework: junit4
 testObservability: true
 browserstackAutomation: true
 
-app: bs://sample.app
+app: bs://2689d6631ff8888a06599ca0d46b12eed3a7a49f
+
 
 platforms:
   - deviceName: ${DEVICE_NAME}
